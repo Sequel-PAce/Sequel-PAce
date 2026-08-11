@@ -1,5 +1,5 @@
-Sequel PAce is a fast, easy-to-use Mac database management application for working with PostgreSQL databases.
+Sequel PAce is a fast, native macOS database client for PostgreSQL.
 
-With Sequel Ace, you can write custom queries, or utilize the built-in filtering system to scope down to just what you're looking for. SSH, socket, and local connections are all supported, making all your databases accessible with ease.
+Write custom queries, browse and edit table data, manage schemas, functions, and sequences, and import or export data. SSH tunnel, TCP, and local PostgreSQL connections are supported.
 
-Sequel Ace is open source! If you experience issues or have suggestions, check out the GitHub repository to get involved - https://github.com/Sequel-Ace/Sequel-Ace
+Sequel PAce is free and open source. Source code, support, and releases are available at https://github.com/Sequel-PAce/Sequel-PAce

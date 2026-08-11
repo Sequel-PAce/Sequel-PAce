@@ -784,37 +784,6 @@ Gw
                         </constraints>
                     </view>
                 </box>
-                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gcQ-a7-Kqd">
-                    <rect key="frame" x="18" y="29" width="154" height="20"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="150" id="UXx-vH-pTm"/>
-                        <constraint firstAttribute="height" constant="20" id="cZz-2P-Xzw"/>
-                    </constraints>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Analytics" id="6mk-ml-lFe">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <button translatesAutoresizingMaskIntoConstraints="NO" id="2aR-JM-Lbr">
-                    <rect key="frame" x="178" y="27" width="342" height="24"/>
-                    <buttonCell key="cell" type="check" title="Share anonymized usage analytics with developers" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="mZ1-oa-LuT">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="22" id="f9S-3k-CY3"/>
-                    </constraints>
-                    <connections>
-                        <binding destination="117" name="value" keyPath="values.SaveApplicationUsageAnalytics" id="PGy-Vc-fm7"/>
-                    </connections>
-                </button>
-                <box autoresizesSubviews="NO" verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="XAX-zM-z61">
-                    <rect key="frame" x="180" y="57" width="340" height="5"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="1" id="GuS-Im-MmS"/>
-                    </constraints>
-                </box>
                 <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NBD-nG-VYi">
                     <rect key="frame" x="18" y="453" width="154" height="20"/>
                     <constraints>

@@ -55,7 +55,6 @@
 #include <stdlib.h>
 
 #import "sequel-pace-Swift.h"
-@import AppCenterAnalytics;
 
 NSInteger SPEditMenuCopy               = 2001;
 NSInteger SPEditMenuCopyWithColumns    = 2002;
@@ -538,17 +537,6 @@ NSString *kFieldTypeGroup = @"FIELDGROUP";
             [tbColumns addObject:[NSNull null]];
 
 	} // end of column loop
-
-    if(errorDict.count > 0){
-        SPLog(@"autoIncrement error");
-        @try {
-            if ([prefs boolForKey:SPSaveApplicationUsageAnalytics]) {
-                [MSACAnalytics trackEvent:@"error" withProperties:errorDict];
-            }
-        } @catch (NSException * e) {
-            SPLog(@"MSACAppCenter Exception on trackEvent Report: %@", e);
-        }
-    }
 
     // --- SECOND PART --- Build the SQL with the previous selected columns
 

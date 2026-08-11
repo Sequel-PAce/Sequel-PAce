@@ -394,8 +394,6 @@
 		A2A868B92EDC06BF00FE08B1 /* SPPostgresStreamingResultStore.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A868B32EDC06BF00FE08B1 /* SPPostgresStreamingResultStore.m */; };
 		A2A868BA2EDC06BF00FE08B1 /* SPPostgresConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A868B42EDC06BF00FE08B1 /* SPPostgresConnection.m */; };
 		A2A868BB2EDC06BF00FE08B1 /* SPPostgresFastStreamingResult.m in Sources */ = {isa = PBXBuildFile; fileRef = A2A868B52EDC06BF00FE08B1 /* SPPostgresFastStreamingResult.m */; };
-		A2E041332EDC084C000BD615 /* AppCenterCrashes in Frameworks */ = {isa = PBXBuildFile; productRef = 515D303E25BD7DE60021CF1E /* AppCenterCrashes */; };
-		A2E041342EDC084C000BD615 /* AppCenterAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 515D304025BD7DE60021CF1E /* AppCenterAnalytics */; };
 		A5A345F94B12EBF912FF71D4 /* SPDatabaseDocument+ViewControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 8AFB4ABAE417C961903CA685 /* SPDatabaseDocument+ViewControl.m */; };
 		A6B1D3524D17F9FA4599AEE4 /* SPDatabaseDocument+TableControl.m in Sources */ = {isa = PBXBuildFile; fileRef = DB8384FFEBB3882F0EC1473E /* SPDatabaseDocument+TableControl.m */; };
 		A8A6B9FA0F8A9FF926F22CE8 /* SPDatabaseDocument+Print.m in Sources */ = {isa = PBXBuildFile; fileRef = D2C70473117B9931ED228068 /* SPDatabaseDocument+Print.m */; };
@@ -1241,8 +1239,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A2E041342EDC084C000BD615 /* AppCenterAnalytics in Frameworks */,
-				A2E041332EDC084C000BD615 /* AppCenterCrashes in Frameworks */,
 				96A5DDB82D63C8E70079105E /* libc++.tbd in Frameworks */,
 				963DA1C72CACC71000B5A544 /* QuickLookUI.framework in Frameworks */,
 				1A89556F25D6C8880060CE72 /* Alamofire in Frameworks */,
@@ -2605,7 +2601,6 @@
 				4DECC4940EC2B447008D359E /* Copy Frameworks */,
 				9691789224A562330012ED42 /* Copy Default Themes and Default Bundles */,
 				96CA8FA02783AA560061C2D1 /* Copy Fonts */,
-				1A62C63425BE08F400DF903B /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -2616,8 +2611,6 @@
 			name = "Sequel PAce";
 			packageProductDependencies = (
 				51D9527525AE2B5300574BEB /* FMDB */,
-				515D303E25BD7DE60021CF1E /* AppCenterCrashes */,
-				515D304025BD7DE60021CF1E /* AppCenterAnalytics */,
 				51BC150025BE138700F1CDC9 /* SnapKit */,
 				1A89556E25D6C8880060CE72 /* Alamofire */,
 			);
@@ -2667,7 +2660,6 @@
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA;
 			packageReferences = (
 				51D9527425AE2B5300574BEB /* XCRemoteSwiftPackageReference "fmdb" */,
-				515D303D25BD7DE60021CF1E /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */,
 				51BC14FF25BE138700F1CDC9 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				1A89556D25D6C8880060CE72 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				513C8CDF2BBC4132001CCE3A /* XCRemoteSwiftPackageReference "ocmock" */,
@@ -3301,6 +3293,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$CONFIGURATION_TEMP_DIR/sequel-pace.build/DerivedSources",
 					"$(PROJECT_DIR)/Frameworks/SPPostgresFramework/Source/**",
+					"$(PROJECT_DIR)/Frameworks/PostgreSQL.framework/Headers",
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Resources/Plists/Unit Tests-Info.plist";
@@ -3340,6 +3333,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$CONFIGURATION_TEMP_DIR/sequel-pace.build/DerivedSources",
 					"$(PROJECT_DIR)/Frameworks/SPPostgresFramework/Source/**",
+					"$(PROJECT_DIR)/Frameworks/PostgreSQL.framework/Headers",
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Resources/Plists/Unit Tests-Info.plist";
@@ -3379,6 +3373,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$CONFIGURATION_TEMP_DIR/sequel-pace.build/DerivedSources",
 					"$(PROJECT_DIR)/Frameworks/SPPostgresFramework/Source/**",
+					"$(PROJECT_DIR)/Frameworks/PostgreSQL.framework/Headers",
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Resources/Plists/Unit Tests-Info.plist";
@@ -3482,6 +3477,7 @@
 				AUTOMATION_APPLE_EVENTS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "Entitlements/Sequel PAce.entitlements";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMPRESS_PNG_FILES = YES;
@@ -3513,7 +3509,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Resources/Plists/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INSTALL_PATH = /Applications;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4355,14 +4351,6 @@
 				kind = branch;
 			};
 		};
-		515D303D25BD7DE60021CF1E /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/microsoft/appcenter-sdk-apple";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.4;
-			};
-		};
 		51BC14FF25BE138700F1CDC9 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit";
@@ -4391,16 +4379,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 513C8CDF2BBC4132001CCE3A /* XCRemoteSwiftPackageReference "ocmock" */;
 			productName = OCMock;
-		};
-		515D303E25BD7DE60021CF1E /* AppCenterCrashes */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 515D303D25BD7DE60021CF1E /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */;
-			productName = AppCenterCrashes;
-		};
-		515D304025BD7DE60021CF1E /* AppCenterAnalytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 515D303D25BD7DE60021CF1E /* XCRemoteSwiftPackageReference "appcenter-sdk-apple" */;
-			productName = AppCenterAnalytics;
 		};
 		51BC150025BE138700F1CDC9 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;

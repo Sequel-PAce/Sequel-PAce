@@ -110,7 +110,7 @@ void SPApplyRevisionChanges(void)
 		introText = NSLocalizedString(@"We've made a few changes but we thought you should know about some particularly important ones:", "Important release notes informational text, multiple changes");
 	}
 
-	[NSAlert createAlertWithTitle:NSLocalizedString(@"Thanks for updating Sequel Ace!", @"Release notes dialog title thanking user for upgrade") message:[NSString stringWithFormat:@"%@\n\n • %@", introText, [releaseNotes componentsJoinedByString:@"\n\n • "]] primaryButtonTitle:NSLocalizedString(@"Continue", @"Continue button title") secondaryButtonTitle:NSLocalizedString(@"View full release notes", @"Release notes button title") primaryButtonHandler:nil secondaryButtonHandler:^{
+	[NSAlert createAlertWithTitle:NSLocalizedString(@"Thanks for updating Sequel PAce!", @"Release notes dialog title thanking user for upgrade") message:[NSString stringWithFormat:@"%@\n\n • %@", introText, [releaseNotes componentsJoinedByString:@"\n\n • "]] primaryButtonTitle:NSLocalizedString(@"Continue", @"Continue button title") secondaryButtonTitle:NSLocalizedString(@"View full release notes", @"Release notes button title") primaryButtonHandler:nil secondaryButtonHandler:^{
 		// Work out whether to link to the normal site or the nightly list
 		NSString *releaseNotesLink = @"https://github.com/Sequel-Ace/Sequel-Ace/releases";
 		[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:releaseNotesLink]];

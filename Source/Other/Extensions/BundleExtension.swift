@@ -62,24 +62,18 @@ import Foundation
     }
 
     public func checkForNewVersion(isFromMenuCheck: Bool) {
-        // DISABLED: Sequel PAce should not check Sequel Ace for updates
-        // TODO: Set up Sequel PAce update server if needed
-        return
-        
-        /*
         if isMASVersion == false {
-            GitHubReleaseManager.setup(GitHubReleaseManager.Config(user: "Sequel-Ace",
-                                                                   project: "Sequel-Ace",
+            GitHubReleaseManager.setup(GitHubReleaseManager.Config(user: "Sequel-PAce",
+                                                                   project: "Sequel-PAce",
                                                                    includeDraft: false,
-                                                                   includePrerelease: isSnapshotBuild ? true : false))
+                                                                   includePrerelease: isSnapshotBuild))
 
             GitHubReleaseManager.sharedInstance.isFromMenuCheck = isFromMenuCheck
             GitHubReleaseManager.sharedInstance.checkRelease(name: versionString)
         }
-        */
     }
 
-    /// Attempts to get the ."Sequel Ace URL scheme" from Info.plist
+    /// Attempts to get the Sequel PAce URL scheme from Info.plist.
     /// We are looking for, see below
 //    <key>CFBundleURLTypes</key>
 //        <array>
@@ -107,7 +101,7 @@ import Foundation
             return nil
         }
 
-        let expectedDictionary = bundleURLTypes.first { $0["CFBundleURLName"] as? String == "Sequel Ace URL scheme" }
+        let expectedDictionary = bundleURLTypes.first { $0["CFBundleURLName"] as? String == "Sequel PAce URL scheme" }
         return [(expectedDictionary?["CFBundleURLSchemes"] as? [String])?.first?.trimmedString, "://"].compactMap { $0 }.joined(separator: "")
     }
 }

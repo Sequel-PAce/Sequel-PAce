@@ -60,7 +60,6 @@
 #import "SPFunctions.h"
 #import "sequel-pace-Swift.h"
 #include <tgmath.h>
-@import AppCenterAnalytics;
 
 static NSInteger spTooltipCounter = 0;
 
@@ -190,23 +189,6 @@ static CGFloat slow_in_out (CGFloat t)
             [errorDict safeSetObject:text forKey:@"textMut"];
         }
         
-        if(errorDict.count > 0){
-            NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-            @try {
-                if ([prefs boolForKey:SPSaveApplicationUsageAnalytics]) {
-                    executeOnBackgroundThread(^{
-                        @try {
-                            [MSACAnalytics trackEvent:@"error" withProperties:errorDict];
-                        } @catch (NSException * e) {
-                            SPLog(@"MSACAppCenter Exception on trackEvent Report callback: %@", e);
-                        }
-                    });
-                }
-            } @catch (NSException * e) {
-                SPLog(@"MSACAppCenter Exception on trackEvent Report: %@", e);
-            }
-        }
-
 		if(text)
 		{
 			int fontSize = ([displayOptions objectForKey:@"fontsize"]) ? [[displayOptions objectForKey:@"fontsize"] intValue] : 10;
@@ -573,4 +555,3 @@ static CGFloat slow_in_out (CGFloat t)
 }
 
 @end
-

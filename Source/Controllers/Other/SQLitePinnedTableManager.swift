@@ -3,7 +3,6 @@
 // Copyright (c) 2021 Sequel-Ace. All rights reserved.
 //
 
-import AppCenterAnalytics
 import Foundation
 import FMDB
 import OSLog
@@ -192,11 +191,6 @@ import OSLog
     private func logDBError(_ error: Error) {
         Log.error("Query failed: \(error.localizedDescription)")
 
-        if prefs.bool(forKey: SPSaveApplicationUsageAnalytics) {
-            DispatchQueue.background(background: {
-                Analytics.trackEvent("error", withProperties: ["dbError": error.localizedDescription, "sqliteLibVersion": FMDatabase.sqliteLibVersion()])
-            })
-        }
     }
 
 

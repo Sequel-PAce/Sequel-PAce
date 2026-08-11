@@ -9,7 +9,6 @@
 #import "SPFunctions.h"
 #import "SPAppController.h"
 @import Cocoa;
-@import AppCenterCrashes;
 
 
 // see: https://docs.microsoft.com/en-us/appcenter/sdk/crashes/macos#enable-catching-uncaught-exceptions-thrown-on-the-main-thread
@@ -42,16 +41,6 @@
             NSLog(@"Error killing SSH processes: %@", e);
         }
     });
-
-    // Forward exception to MSACCrashes (optional analytics)
-    @try {
-        NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-        if ([prefs boolForKey:SPSaveApplicationUsageAnalytics]) {
-            [MSACCrashes applicationDidReportException:exception];
-        }
-    } @catch (NSException *e) {
-        NSLog(@"MSACAppCenter Exception on Crash Report: %@", e);
-    }
 
     // DEVELOPMENT MODE: Show alert instead of crashing
     // Use dispatch_async to avoid blocking or deadlocking

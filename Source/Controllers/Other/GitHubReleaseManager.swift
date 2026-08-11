@@ -176,7 +176,6 @@ import OSLog
         let prefs: UserDefaults = UserDefaults.standard
         var localURL: URL
         let message: String
-        var asset: Asset?
 
         if isFromMenuCheck == false && prefs.string(forKey: SPSkipNewReleaseAvailable) == availableReleaseName {
             Log.debug("The user has opted out of more alerts regarding this version")
@@ -195,10 +194,6 @@ import OSLog
 
         localURL = url
 
-        if let availableAsset = availableRelease?.assets.first(where: { $0.browserDownloadURL.count > 0 }) {
-            asset = availableAsset
-        }
-
         message = NSLocalizedString("Version %@ is available. You are currently running %@",
                                     comment: "Version %@ is available. You are currently running %@").format(availableReleaseName, currentReleaseName)
 
@@ -211,9 +206,6 @@ import OSLog
         alert.alertStyle = .informational
         alert.addButton(withTitle: NSLocalizedString("View", comment: "View button")).tag = GitHubReleaseManager.NSModalResponseView.rawValue
 
-        if asset != nil {
-            alert.addButton(withTitle: NSLocalizedString("Download", comment: "Download new version")).tag = GitHubReleaseManager.NSModalResponseDownload.rawValue
-        }
         alert.addButton(withTitle: NSLocalizedString("Cancel", comment: "cancel button")).tag = NSApplication.ModalResponse.cancel.rawValue
 
         alert.beginSheetModal(for: mainWindow) { [self] (returnCode: NSApplication.ModalResponse) -> Void in
@@ -228,9 +220,6 @@ import OSLog
             case GitHubReleaseManager.NSModalResponseView:
                 self.Log.debug("user clicked view")
                 NSWorkspace.shared.open(localURL)
-            case GitHubReleaseManager.NSModalResponseDownload:
-                self.Log.debug("user clicked download")
-                self.downloadNewRelease(asset: asset!) // already checked that this is not nil
             case NSApplication.ModalResponse.cancel:
                 self.Log.debug("user clicked cancel")
             default:

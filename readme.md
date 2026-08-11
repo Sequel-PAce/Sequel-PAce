@@ -37,12 +37,12 @@ PostgreSQL client library is required. You can install it via Homebrew:
 
 ```bash
 # Install PostgreSQL (includes libpq)
-brew install postgresql@15
+brew install postgresql@17
 
 # Verify libpq installation
 which pg_config
-# Output: /opt/homebrew/opt/postgresql@15/bin/pg_config (Apple Silicon)
-# or: /usr/local/opt/postgresql@15/bin/pg_config (Intel Mac)
+# Output: /opt/homebrew/opt/postgresql@17/bin/pg_config (Apple Silicon)
+# or: /usr/local/opt/postgresql@17/bin/pg_config (Intel Mac)
 ```
 
 #### 2. Xcode and Command Line Tools
@@ -95,7 +95,7 @@ After opening the project in Xcode:
    ```
 
 #### 4. Select Scheme
-- Üst bar'dan scheme seçiciden **"Sequel Ace"** veya **"Sequel PAce Debug"** seçin
+- Select **"Sequel PAce Debug"** from the scheme selector
 - Choose **"My Mac"** as destination
 
 #### 5. Build and Run

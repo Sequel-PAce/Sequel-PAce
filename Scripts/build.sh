@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Sequel PAce CLI Build Script
-# Supports: debug, release, tests, archive, clean, run
+# Supports: debug, release, package, notarize, tests, archive, clean, run
 #
 # Usage:
 #   ./Scripts/build.sh debug    - Build debug configuration
@@ -104,7 +104,7 @@ print_usage() {
     echo "  debug     Build debug configuration"
     echo "  release   Build release configuration"
     echo "  package   Build release and create signed .dmg"
-    echo "  notarize  Notarize existing DMG and re-upload to GitHub release"
+    echo "  notarize  Notarize and staple an existing signed DMG"
     echo "  tests     Run unit tests"
     echo "  archive   Create distribution archive"
     echo "  clean     Clean build folder"
@@ -211,6 +211,7 @@ do_tests() {
         -scheme "$SCHEME_TESTS" \
         -configuration Debug \
         -destination "platform=macOS,arch=$ARCH" \
+        -derivedDataPath "$BUILD_DIR" \
         HEADER_SEARCH_PATHS="\$(inherited) ${PG_INCLUDE}" \
         LIBRARY_SEARCH_PATHS="\$(inherited) ${PG_LIB}" \
         OTHER_LDFLAGS="\$(inherited) -L${PG_LIB} -lpq" \
@@ -240,17 +241,16 @@ do_archive() {
     echo -e "${BLUE}Archive location: $archive_path${NC}"
 }
 
-# Command: package — builds release, signs (Developer ID or ad-hoc), and wraps in a DMG
+# Command: package — builds release, signs with Developer ID, notarizes, and wraps in a DMG
 #
-# Signing identity is read EXCLUSIVELY from environment variables — never hardcoded:
+# Signing identity is read from an environment variable or the local keychain — never hardcoded:
 #   CODE_SIGN_IDENTITY  — full cert name, e.g. "Developer ID Application: Name (TEAMID)"
 #                         auto-detected via `security find-identity` if unset but a
 #                         Developer ID cert is in the login keychain.
-#   NOTARIZATION_APPLE_ID  — Apple ID for notarytool (optional)
-#   NOTARIZATION_PASSWORD  — app-specific password for notarytool (optional)
-#   NOTARIZATION_TEAM_ID   — team ID for notarytool (optional)
+#   NOTARIZATION_APPLE_ID  — Apple ID for notarytool
+#   NOTARIZATION_PASSWORD  — app-specific password for notarytool
+#   NOTARIZATION_TEAM_ID   — team ID for notarytool
 #
-# Falls back to ad-hoc signing when no Developer ID cert is available.
 do_package() {
     do_release
 
@@ -289,9 +289,8 @@ do_package() {
         # --deep is NOT used for Developer ID (Apple recommends explicit ordering).
         local CODESIGN_FLAGS="--force --options runtime --timestamp --sign"
 
-        # Sign embedded dylibs inside PostgreSQL.framework
-        find "${APP_PATH}/Contents/Frameworks/PostgreSQL.framework" \
-            -name "*.dylib" -o -name "libpq*" 2>/dev/null | while read f; do
+        # Sign embedded dylibs before their containing framework/app bundles.
+        find "${APP_PATH}/Contents/Frameworks" -type f -name "*.dylib" 2>/dev/null | while read f; do
             codesign ${CODESIGN_FLAGS} "${SIGN_ID}" "$f"
         done
         # Sign framework bundles
@@ -300,7 +299,7 @@ do_package() {
             [ -d "$fw_path" ] && codesign ${CODESIGN_FLAGS} "${SIGN_ID}" "$fw_path"
         done
         # Sign SSH tunnel helper
-        local helper="${APP_PATH}/Contents/Resources/SequelAceTunnelAssistant"
+        local helper="${APP_PATH}/Contents/MacOS/SequelAceTunnelAssistant"
         [ -f "$helper" ] && codesign ${CODESIGN_FLAGS} "${SIGN_ID}" \
             --entitlements "${ENTITLEMENTS_HELPER}" "$helper"
         # Sign main app with entitlements
@@ -314,34 +313,13 @@ do_package() {
             && echo -e "${GREEN}✓ Signature verified${NC}" \
             || echo -e "${YELLOW}⚠ Signature verification had warnings${NC}"
 
-        # Notarize if credentials are provided in environment (never hardcoded)
-        if [ -n "${NOTARIZATION_APPLE_ID:-}" ] && \
-           [ -n "${NOTARIZATION_PASSWORD:-}" ] && \
-           [ -n "${NOTARIZATION_TEAM_ID:-}" ]; then
-            echo -e "${BLUE}Notarizing...${NC}"
-            # Create a temporary zip for notarytool submission
-            local ZIP_PATH="${BUILD_DIR}/sequel-pace-notarize.zip"
-            ditto -c -k --keepParent "${APP_PATH}" "${ZIP_PATH}"
-            xcrun notarytool submit "${ZIP_PATH}" \
-                --apple-id "${NOTARIZATION_APPLE_ID}" \
-                --password "${NOTARIZATION_PASSWORD}" \
-                --team-id "${NOTARIZATION_TEAM_ID}" \
-                --wait \
-                && xcrun stapler staple "${APP_PATH}" \
-                && echo -e "${GREEN}✓ Notarization complete and stapled${NC}" \
-                || echo -e "${YELLOW}⚠ Notarization failed — DMG will still work with the install script${NC}"
-            rm -f "${ZIP_PATH}"
-        else
-            echo -e "${YELLOW}ℹ Notarization skipped — set NOTARIZATION_APPLE_ID, NOTARIZATION_PASSWORD, NOTARIZATION_TEAM_ID to enable${NC}"
-        fi
     else
-        echo -e "${YELLOW}ℹ No Developer ID cert found — applying ad-hoc codesign${NC}"
-        echo -e "${YELLOW}  Set CODE_SIGN_IDENTITY env var to use Developer ID signing${NC}"
-        codesign --force --deep --sign - "${APP_PATH}"
-        echo -e "${GREEN}✓ Ad-hoc signature applied${NC}"
+        echo -e "${RED}✗ No Developer ID Application certificate found.${NC}"
+        echo "  Refusing to create an ad-hoc release artifact."
+        exit 1
     fi
 
-    # Build DMG with custom background, icon layout, and install helper
+    # Build DMG with a standard drag-to-Applications layout.
     echo -e "${BLUE}Creating DMG...${NC}"
 
     local DMG_TMP="${BUILD_DIR}/sequel-pace-tmp.dmg"
@@ -359,17 +337,6 @@ do_package() {
     if [ -f "${BACKGROUND_SRC}" ]; then
         cp "${BACKGROUND_SRC}" "${DMG_STAGING}/.background/background.png"
     fi
-
-    # Install helper script — removes Gatekeeper quarantine automatically
-    cat > "${DMG_STAGING}/Install Sequel PAce.command" <<'INSTALL_EOF'
-#!/bin/bash
-cd "$(dirname "$0")"
-echo "Installing Sequel PAce..."
-cp -R "Sequel PAce.app" /Applications/
-xattr -dr com.apple.quarantine "/Applications/Sequel PAce.app"
-echo "Done. Launch Sequel PAce from your Applications folder."
-INSTALL_EOF
-    chmod +x "${DMG_STAGING}/Install Sequel PAce.command"
 
     # Create a read-write DMG large enough to hold contents + layout metadata
     local STAGING_SIZE
@@ -389,7 +356,7 @@ INSTALL_EOF
         | grep "/Volumes/" | awk '{print $NF}')
 
     # Apply icon layout and background via AppleScript
-    osascript <<APPLESCRIPT
+    if ! osascript <<APPLESCRIPT
 tell application "Finder"
     tell disk "${DMG_VOLUME}"
         open
@@ -402,12 +369,9 @@ tell application "Finder"
         set icon size of viewOptions to 96
         set text size of viewOptions to 11
         set background picture of viewOptions to file ".background:background.png"
-        -- App icon: left zone (Option A — drag)
+        -- App icon and Applications alias
         set position of item "Sequel PAce.app" of container window to {200, 300}
-        -- Applications alias: left zone target
-        set position of item "Applications" of container window to {340, 300}
-        -- Install script: right zone (Option B — recommended)
-        set position of item "Install Sequel PAce.command" of container window to {615, 310}
+        set position of item "Applications" of container window to {615, 300}
         close
         open
         update without registering applications
@@ -416,6 +380,9 @@ tell application "Finder"
     end tell
 end tell
 APPLESCRIPT
+    then
+        echo -e "${YELLOW}⚠ Finder layout could not be applied; creating a standard drag-to-Applications DMG.${NC}"
+    fi
 
     # Unmount, convert to read-only compressed DMG
     hdiutil detach "/Volumes/${DMG_VOLUME}" >/dev/null 2>&1 || hdiutil detach "${MOUNT_DIR}" >/dev/null 2>&1 || true
@@ -426,8 +393,9 @@ APPLESCRIPT
 
     echo -e "${GREEN}✓ Package complete${NC}"
     echo -e "${BLUE}DMG: ${DMG_PATH}${NC}"
-    echo -e "${YELLOW}  Install: run 'Install Sequel PAce.command' inside the DMG${NC}"
-    echo -e "${YELLOW}  Or in Terminal: xattr -dr com.apple.quarantine \"/Applications/Sequel PAce.app\"${NC}"
+    echo -e "${YELLOW}  Install: drag Sequel PAce to Applications, then open it normally.${NC}"
+
+    do_notarize
 }
 
 # Command: run
@@ -437,15 +405,13 @@ do_run() {
     open "${BUILD_DIR}/Build/Products/Debug/${APP_NAME}"
 }
 
-# Command: notarize — submit existing signed DMG to Apple notary, staple, re-upload to GitHub.
+# Command: notarize — submit an existing signed DMG to Apple notary and staple it.
 #
 # Required env vars (never hardcoded):
 #   NOTARIZATION_APPLE_ID  — Apple ID email
 #   NOTARIZATION_PASSWORD  — app-specific password from appleid.apple.com
 #   NOTARIZATION_TEAM_ID   — 10-char team ID
 #
-# Optional:
-#   GITHUB_RELEASE_TAG     — GitHub release tag to update (default: latest)
 do_notarize() {
     local DMG_PATH="${BUILD_DIR}/Sequel PAce.dmg"
     local APP_PATH="${BUILD_DIR}/Build/Products/Distribution/${APP_NAME}"
@@ -494,16 +460,6 @@ do_notarize() {
         && echo -e "${GREEN}✓ Gatekeeper: accepted${NC}" \
         || echo -e "${YELLOW}⚠ spctl check had warnings (may be fine for DMG)${NC}"
 
-    # Re-upload to GitHub release if gh is available
-    if command -v gh &>/dev/null; then
-        local TAG="${GITHUB_RELEASE_TAG:-$(gh release list --limit 1 --json tagName -q '.[0].tagName')}"
-        if [ -n "$TAG" ]; then
-            echo -e "${BLUE}Uploading notarized DMG to GitHub release ${TAG}...${NC}"
-            gh release upload "${TAG}" "${DMG_PATH}#Sequel-PAce-${TAG}-arm64.dmg" --clobber \
-                && echo -e "${GREEN}✓ GitHub release updated: ${TAG}${NC}" \
-                || echo -e "${YELLOW}⚠ GitHub upload failed — DMG is at: ${DMG_PATH}${NC}"
-        fi
-    fi
 }
 
 # Main

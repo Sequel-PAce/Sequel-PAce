@@ -120,7 +120,6 @@ NSString *SPDisplayTableViewColumnTypes          = @"DisplayTableViewColumnTypes
 NSString *SPDisplayCommentsInTablesList          = @"DisplayCommentsInTablesList";
 NSString *SPCustomQueryMaxHistoryItems           = @"CustomQueryMaxHistoryItems";
 NSString *SPCustomQuerySaveHistoryIndividually   = @"CustomQuerySaveHistoryIndividually";
-NSString *SPSaveApplicationUsageAnalytics        = @"SaveApplicationUsageAnalytics";
 NSString *SPAppearance                           = @"Appearance";
 
 // Tables Prefpane

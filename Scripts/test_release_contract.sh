@@ -16,6 +16,9 @@ rg -q 'GitHubReleaseManager\.Config\(user: "Sequel-PAce"' Source/Other/Extension
 rg -Fq 'find "${APP_PATH}/Contents/Frameworks" -type f -name "*.dylib"' Scripts/build.sh \
     || fail "all embedded dylibs must be signed before packaging"
 
+rg -Fq -- '-derivedDataPath "$BUILD_DIR/tests"' Scripts/build.sh \
+    || fail "unit tests must not share release DerivedData"
+
 rg -q 'Contents/MacOS/SequelAceTunnelAssistant' Scripts/build.sh \
     || fail "the tunnel helper must be signed at its shipped path"
 

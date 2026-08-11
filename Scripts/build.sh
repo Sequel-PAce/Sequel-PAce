@@ -211,7 +211,7 @@ do_tests() {
         -scheme "$SCHEME_TESTS" \
         -configuration Debug \
         -destination "platform=macOS,arch=$ARCH" \
-        -derivedDataPath "$BUILD_DIR" \
+        -derivedDataPath "$BUILD_DIR/tests" \
         HEADER_SEARCH_PATHS="\$(inherited) ${PG_INCLUDE}" \
         LIBRARY_SEARCH_PATHS="\$(inherited) ${PG_LIB}" \
         OTHER_LDFLAGS="\$(inherited) -L${PG_LIB} -lpq" \
